@@ -955,6 +955,12 @@ export class ClineAgent implements acp.Agent {
 		// Update Controller mode if active
 		const controller = this.#sessionControllers.get(session)
 		if (controller) {
+			// Update both session override and global state so the mode switch
+			// takes effect even when the initial mode was set via CLI flag (-p/--plan).
+			// Session overrides have higher precedence than global state in
+			// StateManager.getGlobalSettingsKey(), so without updating the override,
+			// a mode set by -p would be sticky and ignore subsequent toggles.
+			controller.stateManager.setSessionOverride("mode", session.mode)
 			controller.stateManager.setGlobalState("mode", session.mode)
 
 			// If there's an active task, switch its mode
